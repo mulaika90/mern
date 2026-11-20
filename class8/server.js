@@ -1,15 +1,18 @@
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import bcrypt from "bcryptjs";
-import app from "./src/app.js";
-import connectDB from "./src/db/db.js";
-import userModel from "./src/models/users.model.js";
 
 const envPath = fileURLToPath(new URL("./.env", import.meta.url));
 
 if (existsSync(envPath)) {
   process.loadEnvFile(envPath);
 }
+
+const [{ default: app }, { default: connectDB }, { default: userModel }] = await Promise.all([
+  import("./src/app.js"),
+  import("./src/db/db.js"),
+  import("./src/models/users.model.js")
+]);
 
 const port = Number(process.env.PORT) || 3000;
 

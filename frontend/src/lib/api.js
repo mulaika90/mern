@@ -1,6 +1,6 @@
 const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL ??
-  (import.meta.env.DEV ? "" : "https://mern-stack-hackathon-snowy.vercel.app")
+  (import.meta.env.DEV ? "" : "https://mern-dusky-mu.vercel.app")
 ).replace(/\/+$/, "");
 
 export function apiUrl(path) {

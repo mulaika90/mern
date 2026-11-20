@@ -1,6 +1,7 @@
 import express  from "express";
 import cors from "cors";
 import { fileURLToPath } from "node:url";
+import connectDB from "./db/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
@@ -11,8 +12,11 @@ import cookieParser from "cookie-parser";
 const app = express();
 const allowedOrigins = new Set(
     (
-        process.env.FRONTEND_ORIGINS
-        || "https://mern-stack-hackathon-7xqr.vercel.app"
+        [
+            "https://mern-stack-hackathon-7xqr.vercel.app",
+            "https://mern-px2g.vercel.app",
+            ...(process.env.FRONTEND_ORIGINS || "").split(",")
+        ].filter(Boolean).join(",")
     )
         .split(",")
         .map((origin) => origin.trim().replace(/\/+$/, ""))
@@ -30,6 +34,18 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+
+app.use("/api", async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        console.error("MongoDB connection failed for API request:", error.message);
+        res.status(503).json({
+            message: "The clinic database is unavailable. Check the backend MongoDB configuration and Atlas network access."
+        });
+    }
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/product", productRoutes);
